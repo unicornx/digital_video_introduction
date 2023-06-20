@@ -97,10 +97,20 @@ If we chose to represent these colors using the [primary colors (red, green and 
 
 We'll call each point in this matrix **a pixel** (picture element). One pixel represents the **intensity** (usually a numeric value) of a given color. For example, a **red pixel** means 0 of green, 0 of blue and maximum of red. The **pink color pixel** can be formed with a combination of the three colors. Using a representative numeric range from 0 to 255, the pink pixel is defined by **Red=255, Green=192 and Blue=203**.
 
+关键词：
+- **pixel**
+- **intensity**：像素的 RGB 的取值
+
 > #### Other ways to encode a color image
 > Many other possible models may be used to represent the colors that make up an image. We could, for instance, use an indexed palette where we'd only need a single byte to represent each pixel instead of the 3 needed when using the RGB model. In such a model we could use a 2D matrix instead of a 3D matrix to represent our color, this would save on memory but yield fewer color options.
 >
 > ![NES palette](/i/nes-color-palette.png "NES palette")
+
+电子设备颜色表示法：真实世界中的影像与早期的视频处理与传输系统所处理的都是模拟信号。然而为了能适应现代的计算机、网络传输与数字视频处理系统，模拟的视频信号必须转换成数字格式。
+- RGB：这种方式，一共能表达 256 * 256 * 256 = 16,777,216 种，因此也简称为 1600 万色。RGB 三色，每色有 8bit，这种方式表达出来的颜色，也被称为 24位色（占用24bit）。这个颜色应超过了人眼可见的全部色彩。再高的话，对于我们人眼来说，已经没有意义了，完全识别不出来。
+- YUV：“Y” 表示明亮度（Luminance、Luma），“U” 和 “V” 则是色度（Chrominance、Chroma），包含了色调和饱和度。YUV 细分的话有 Y'UV，YUV，YCbCr，YPbPr 等类型。在实际的编解码等视频处理的过程中，YUV 格式比 RGB 格式更为常用。其中 YCbCr 主要用于数字信号，在视频通信系统中（特别是视频编解码）的 “YUV” 图像就是 YCbCr。在平常的工作交流中，所称的 YUV 也是 YCbCr。其中 Y 与 YUV 中的 Y 含义一致，Cb 反映的是 RGB 输入信号蓝色部分与 RGB 信号亮度值之间的差异，而 Cr 反映了 RGB 输入信号红色部分与 RGB 信号亮度值之间的差异，此即所谓的色差信号。之所以采用 YUV 这样的方式，主要是因为人的感官对亮度信息的敏感度远高于对色度信息。因此相对于其他像素格式，YUV 的最大优势是可以适当降低色度分量的采样率，并保证不对图像造成太大影响。而且，使用这种方式还可以兼容黑白和彩色显示设备。对于黑白显示设备，只需要去除色度分量，只显示亮度分量即可。有关 YUV 中的色度采样方式 4:4:4，4:2:2 和 4:2:0 的概念参考 [攝影常見問題彙整：4:2:2 和 4:2:0 分別代表什麼意思？](https://snapshot.canon-asia.com/tw/article/zh_tw/videography-faq-what-do-422-and-420-mean) 的解释。
+  - YUV 和 RGB 之间的转换，拍摄时为 RGB，转成 YUV 传输，播放时再恢复成 RGB。
+  - YUV 的存储格式。YUV 格式有三大类：planar，packed，semi-planar。
 
 For instance, look at the picture down below. The first face is fully colored. The others are the red, green, and blue planes (shown as gray tones).
 
@@ -114,6 +124,8 @@ And each color intensity requires a certain amount of bits, this quantity is kno
 
 Another property of an image is the **resolution**, which is the number of pixels in one dimension. It is often presented as width × height, for example, the **4×4** image below.
 
+有关 **resolution**，我们会涉及一个概念，即 PPI （“Pixels Per Inch”），即 每英寸像素。理论上屏幕 PPI 越高，屏幕就越精细，画质相对就更出色。
+
 ![image resolution](/i/resolution.png "image resolution")
 
 > #### Hands-on: play around with image and color
@@ -122,6 +134,11 @@ Another property of an image is the **resolution**, which is the number of pixel
 > You can also learn [how image filters (edge detection, sharpen, blur...) work](/filters_are_easy.ipynb).
 
 Another property we can see while working with images or video is the **aspect ratio** which simply describes the proportional relationship between width and height of an image or pixel.
+
+关键词：**aspect ratio**，从宏观上描述一个视频如何被播放器正确显示。包括三个基础概念
+- PAR：Pixel Aspect Ratio，单个像素的宽高比，大多数情况像素宽高比为1：1，也就是一个正方形像素，如果不是1：1，则该像素可以理解为长方形像素。常用的PAR比率有（1：1，10：11，40：33，16：11，12：11）．
+- DAR：Display Aspect Ratio，显示宽高比。即最终播放出来的画面的宽与高之比。比如常见的 16：9 和 4：3 等。缩放视频也要按这个比例来，否则会使图像看起来被压扁或者拉长了似的。
+- SAR：Sample Aspect Ratio，采样纵横比，表示横向的像素点数和纵向的像素点数的比值，即为我们通常提到的分辨率宽高比。就是对图像采集时，横向采集与纵向采集构成的点阵，横向点数与纵向点数的比值。比如 VGA 图像 640／480 ＝ 4：3
 
 When people says this movie or picture is **16x9** they usually are referring to the **Display Aspect Ratio (DAR)**, however we also can have different shapes of individual pixels, we call this **Pixel Aspect Ratio (PAR)**.
 
@@ -134,9 +151,14 @@ When people says this movie or picture is **16x9** they usually are referring to
 
 Finally, we can define a **video** as a **succession of *n* frames** in **time** which can be seen as another dimension, *n* is the frame rate or frames per second (FPS).
 
+定义：**video**，**frame**
+术语：FPS：frames per second
+
 ![video](/i/video.png "video")
 
 The number of bits per second needed to show a video is its **bit rate**.
+
+定义：**bit rate**
 
 > bit rate = width * height * bit depth * frames per second
 
@@ -151,6 +173,18 @@ When the **bit rate** is nearly constant it's called constant bit rate (**CBR**)
 In the early days, engineers came up with a technique for doubling the perceived frame rate of a video display **without consuming extra bandwidth**. This technique is known as **interlaced video**; it basically sends half of the screen in 1 "frame" and the other half in the next "frame".
 
 Today screens render mostly using **progressive scan technique**. Progressive is a way of displaying, storing, or transmitting moving images in which all the lines of each frame are drawn in sequence.
+
+显示设备上表示运动图像的方法：
+- **隔行扫描**（**interlaced video**）
+- **逐行扫描**（**progressive scan**）
+  https://en.wikipedia.org/wiki/Progressive_scan
+  https://zh.wikipedia.org/wiki/%E9%80%90%E8%A1%8C%E6%89%AB%E6%8F%8F
+  逐行扫描（Progressive scan）是一种在显示设备上表示运动图像的方法
+
+逐行扫描和隔行扫描的区别:http://m.pjtime.com/2017/8/m171828333779.shtml
+
+什麼是逐行掃描和隔行掃描？它們有什麼優缺點？:https://zh-hk.pomeas.com/blog/2021/5/15/what-are-progressive-and-interlaced-scans-what-aretheir-advantages-and-disadvantages/ 从历史的发展角度谈了为什么引入隔行扫描以及为啥现在又转向逐行扫描
+
 
 ![interlaced vs progressive](/i/interlaced_vs_progressive.png "interlaced vs progressive")
 
@@ -323,6 +357,11 @@ What about referencing the past and future frames to provide even a better compr
 > #### Hands-on: Compare videos with B-frame
 > You can generate two renditions, first with B-frames and other with [no B-frames at all](/encoding_pratical_examples.md#no-b-frames-at-all) and check the size of the file as well as the quality.
 
+
+参考：
+
+- [视频编码之I帧 、P帧、B帧](https://www.jianshu.com/p/18af03556431)
+
 ### Summary
 
 These frames types are used to **provide better compression**. We'll look how this happens in the next section, but for now we can think of **I-frame as expensive while P-frame is cheaper but the cheapest is the B-frame.**
@@ -480,6 +519,15 @@ Once we have the partitions, we can make predictions over them. For the [inter p
 
 ## 3rd step - transform
 
+转换/变换（transform）
+参考 [Ref 1]
+
+各种变换，如离散余弦变换 DCT、小波变换等等。学术上，其目的是将图像进行从空域到频域的变化，通过这些所谓的变换滤掉高频信息，因为人眼对高频信息不敏感，滤掉一些也无所谓。
+
+[图像压缩中，为什么要将图像从空间域转换到频率域？](https://www.zhihu.com/question/39689253)
+
+经过变换，低频的、幅值高的、重要的信息都被归置在左上部；而人类不敏感的、高频的、却又低振幅的数据都放在了右下侧。在接下来的量化步骤，就可以对右下侧的数据开刀了。因此可以简单理解，不管是什么 A 变换还是 B 变换，不要被它的公式和名称吓倒，它只是为了改变队形，为后续的编码和压缩做准备。
+
 After we get the residual block (`predicted partition - real partition`), we can **transform** it in a way that lets us know which **pixels we can discard** while keeping the **overall quality**. There are some transformations for this exact behavior.
 
 Although there are [other transformations](https://en.wikipedia.org/wiki/List_of_Fourier-related_transforms#Discrete_transforms), we'll look more closely at the discrete cosine transform (DCT). The [**DCT**](https://en.wikipedia.org/wiki/Discrete_cosine_transform) main features are:
@@ -558,6 +606,8 @@ As we can see it resembles the original image but it introduced lots of differen
 ## 4th step - quantization
 
 When we throw away some of the coefficients, in the last step (transform), we kinda did some form of quantization. This step is where we chose to lose information (the **lossy part**) or in simple terms, we'll **quantize coefficients to achieve compression**.
+
+这部分的描述建议参考 [Ref 1], 讲得更好更容易懂。
 
 How can we quantize a block of coefficients? One simple method would be a uniform quantization, where we take a block, **divide it by a single value** (10) and round this value.
 
@@ -974,3 +1024,16 @@ Miscellaneous:
 * https://www.youtube.com/watch?v=LWxu4rkZBLw
 * https://web.stanford.edu/class/ee398a/handouts/lectures/EE398a_MotionEstimation_2012.pdf
 * https://sander.saares.eu/categories/drm-is-not-a-black-box/
+
+
+自己追加的中文参考
+
+- [Ref 1] [一文读懂视频编解码原理][r1]
+- [Ref 2] [什么是视频编码(Codec)？][r2]
+- [Ref 3] [图像与视频编码基础知识][r3]
+- [Ref 4] [视频压缩与编解码的基本原理][r4]
+
+[r1]:https://xilinx.eetrend.com/content/2019/100045119.html
+[r2]:https://zhuanlan.zhihu.com/p/187441421
+[r3]:https://zhuanlan.zhihu.com/p/126125840
+[r4]:https://zhuanlan.zhihu.com/p/67305755
